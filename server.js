@@ -1,7 +1,19 @@
-let express = require("express");
+const express = require("express");
+const monogodb = require("mongodb");
 
-let app = express();
-
+const app = express();
+let db;
+// npm i monogodb for installing monogodb in the nodejs
+// monogodb.connect(a, b, c) a means connection where we want to connect, c means the function which the connection component will perform., b means we are setting the monogodb configration property named using new url parser and then colon
+let connectionString =
+  "mongodb+srv://todoAppUser:Ankit@007@cluster0-nq3vl.mongodb.net/TodoApp?retryWrites=true&w=majority";
+monogodb.connect(connectionString, { useNewUrlParser: true }, function(
+  err,
+  client
+) {
+  db = client.db();
+  app.listen(3000);
+});
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/", (req, res) => {
@@ -57,8 +69,7 @@ app.get("/", (req, res) => {
 });
 
 app.post("/create-item", (req, res) => {
-  console.log(req.body.item);
-  res.send("Thanks for submitting the form");
+  db.collection("items").insertOne({ text: req.body.item }, () => {
+    res.send("Thanks for submitting the form");
+  });
 });
-
-app.listen(3000);
